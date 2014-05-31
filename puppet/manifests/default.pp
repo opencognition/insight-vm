@@ -6,6 +6,10 @@ $home         = '/home/vagrant'
 # versions, and for which RVM provides binaries.
 $ruby_version = '2.1.1'
 
+# Pick a Rails version modern enough, that works in the currently supported Rails
+# versions, and for which RVM provides binaries.
+$rails_version = '4.1.1'
+
 Exec {
   path => ['/usr/sbin', '/usr/bin', '/sbin', '/bin']
 }
@@ -46,6 +50,12 @@ class install_mysql {
     require => Class['mysql::server']
   }
 
+  database { 'rails':
+    ensure  => present,
+    charset => 'utf8',
+    require => Class['mysql::server']
+  }
+
   database_user { 'rails@localhost':
     ensure  => present,
     require => Class['mysql::server']
@@ -67,13 +77,10 @@ class { 'install_mysql': }
 class install_postgres {
   class { 'postgresql': }
 
-  class { 'postgresql::server': }
-
-
   class {'postgresql::server':
-    listen => ['192.168.0.1', '127.0.0.1', '10.0.2.2'],
+    listen => ['*'],
     port   => 5432,
-    acl   => ['host all all 192.168.0.2/32 md5', 'host all all 127.0.0.1/32 md5', 'host all all 10.0.2.2/32 md5'],
+    acl   => ['host all all 10.0.2.2/32 trust'],
   }
 
   pg_database { $ar_databases:
@@ -82,8 +89,15 @@ class install_postgres {
     require  => Class['postgresql::server']
   }
 
+  pg_database { 'rails':
+    ensure   => present,
+    encoding => 'UTF8',
+    require  => Class['postgresql::server']
+  }
+
   pg_user { 'rails':
     ensure  => present,
+    password => 'rails',
     require => Class['postgresql::server']
   }
 
@@ -163,3 +177,12 @@ exec { "${as_vagrant} 'gem install bundler --no-rdoc --no-ri'":
 exec { 'update-locale':
   command => 'update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8'
 }
+
+# --- Rails---------------------------------------------------------------------
+
+# Install Rails with gem.
+exec { "${as_vagrant} 'gem install rails --no-rdoc --no-ri'":
+  creates => "${home}/.rvm/bin/rails",
+  require => Exec['install_ruby']
+}
+
