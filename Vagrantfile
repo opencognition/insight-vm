@@ -5,6 +5,11 @@ Vagrant.configure('2') do |config|
   config.vm.box_url  = 'http://files.vagrantup.com/precise32.box'
   config.vm.hostname = 'rails-dev-box'
 
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 4096
+    v.cpus = 2
+  end
+  
   config.vm.provider 'vmware_fusion' do |v, override|
     override.vm.box     = 'precise64'
     override.vm.box_url = 'http://files.vagrantup.com/precise64_vmware.box'
