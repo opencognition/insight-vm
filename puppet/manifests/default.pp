@@ -69,6 +69,13 @@ class install_postgres {
 
   class { 'postgresql::server': }
 
+
+  class {'postgresql::server':
+    listen => ['192.168.0.1', '127.0.0.1', '10.0.2.2'],
+    port   => 5432,
+    acl   => ['host all all 192.168.0.2/32 md5', 'host all all 127.0.0.1/32 md5', 'host all all 10.0.2.2/32 md5'],
+  }
+
   pg_database { $ar_databases:
     ensure   => present,
     encoding => 'UTF8',
