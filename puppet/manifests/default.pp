@@ -35,80 +35,36 @@ package { ['sqlite3', 'libsqlite3-dev']:
   ensure => installed;
 }
 
-# --- MySQL --------------------------------------------------------------------
-
-class install_mysql {
-  class { 'mysql': }
-
-  class { 'mysql::server':
-    config_hash => { 'root_password' => '' }
-  }
-
-  database { $ar_databases:
-    ensure  => present,
-    charset => 'utf8',
-    require => Class['mysql::server']
-  }
-
-  database { 'rails':
-    ensure  => present,
-    charset => 'utf8',
-    require => Class['mysql::server']
-  }
-
-  database_user { 'rails@localhost':
-    ensure  => present,
-    require => Class['mysql::server']
-  }
-
-  database_grant { ['rails@localhost/activerecord_unittest', 'rails@localhost/activerecord_unittest2', 'rails@localhost/inexistent_activerecord_unittest']:
-    privileges => ['all'],
-    require    => Database_user['rails@localhost']
-  }
-
-  package { 'libmysqlclient15-dev':
-    ensure => installed
-  }
-}
-class { 'install_mysql': }
-
 # --- PostgreSQL ---------------------------------------------------------------
 
 class install_postgres {
-  class { 'postgresql': }
 
-  class {'postgresql::server':
-    listen => ['*'],
-    port   => 5432,
-    acl   => ['host all all 10.0.2.2/32 trust'],
+  class { 'postgresql::globals':
+    encoding            => 'UTF8',
+    locale              => 'en_NG',
+    manage_package_repo => true,
+    version             => '9.3',
+  }->
+  class { 'postgresql::server':
+    ip_mask_deny_postgres_user => '0.0.0.0/32',
+    ip_mask_allow_all_users    => '0.0.0.0/0',
+    listen_addresses           => '*',
+    ipv4acls                   => ['host all all 10.0.2.2/32 trust'],
+    manage_firewall            => true,
+    postgres_password          => 'postgres',
   }
 
-  pg_database { $ar_databases:
-    ensure   => present,
-    encoding => 'UTF8',
-    require  => Class['postgresql::server']
+  postgresql::server::role { 'insight':
+    password_hash => postgresql_password('insight_mgr', 'password'),
   }
 
-  pg_database { 'rails':
-    ensure   => present,
-    encoding => 'UTF8',
-    require  => Class['postgresql::server']
-  }
-
-  pg_user { 'rails':
-    ensure  => present,
-    password => 'rails',
-    require => Class['postgresql::server']
-  }
-
-  pg_user { 'vagrant':
-    ensure    => present,
-    superuser => true,
-    require   => Class['postgresql::server']
+  postgresql::server::db { 'insight_development':
+    user     => 'insight_mgr',
+    password => postgresql_password('insight_mgr', 'password'),
   }
 
   package { 'libpq-dev':
-    ensure => installed
+    ensure => installed,
   }
 
   package { 'postgresql-contrib':
@@ -151,7 +107,7 @@ package { 'nodejs':
 exec { 'install_rvm':
   command => "${as_vagrant} 'curl -L https://get.rvm.io | bash -s stable'",
   creates => "${home}/.rvm/bin/rvm",
-  require => Package['curl']
+  require => Package['curl'],
 }
 
 exec { 'install_ruby':
@@ -162,20 +118,20 @@ exec { 'install_ruby':
   # use a ruby patch level known to have a binary
   command => "${as_vagrant} '${home}/.rvm/bin/rvm install ruby-${ruby_version} --binary --autolibs=enabled && rvm alias create default ${ruby_version}'",
   creates => "${home}/.rvm/bin/ruby",
-  require => Exec['install_rvm']
+  require => Exec['install_rvm'],
 }
 
 # RVM installs a version of bundler, but for edge Rails we want the most recent one.
 exec { "${as_vagrant} 'gem install bundler --no-rdoc --no-ri'":
   creates => "${home}/.rvm/bin/bundle",
-  require => Exec['install_ruby']
+  require => Exec['install_ruby'],
 }
 
 # --- Locale -------------------------------------------------------------------
 
 # Needed for docs generation.
 exec { 'update-locale':
-  command => 'update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8'
+  command => 'update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8',
 }
 
 # --- Rails---------------------------------------------------------------------
@@ -183,6 +139,6 @@ exec { 'update-locale':
 # Install Rails with gem.
 exec { "${as_vagrant} 'gem install rails --no-rdoc --no-ri'":
   creates => "${home}/.rvm/bin/rails",
-  require => Exec['install_ruby']
+  require => Exec['install_ruby'],
 }
 

@@ -1,4 +1,4 @@
-# A Virtual Machine for Ruby on Rails Core Development
+# A Virtual Machine for Insight Development and Testing (Ruby 2.1.1, Ruby on Rails 4.1.1, PostgreSQL 9.3)
 
 ## Introduction
 
@@ -16,7 +16,7 @@ This project automates the setup of a development environment for working on Rub
 
 Building the virtual machine is this easy:
 
-    host $ git clone https://github.com/opencognition/rails-dev-box.git
+    host $ git clone https://github.com/opencognition/insight-vm.git
     host $ cd rails-dev-box
     host $ vagrant up
 
@@ -49,15 +49,10 @@ Port 3000 in the host computer is forwarded to port 3000 in the virtual machine.
 
 * SQLite3
 
-* MySQL
-** forwarded port: 13306
-** root: mysql
-** password: 
-
-* Postgres
-** forwarded port: 15432
-** root: postgres
-** password: 
+* PostgreSQL 9.3
+forwarded port: 15432
+root: postgres
+password: postgres
 
 * System dependencies for nokogiri, sqlite3, mysql, mysql2, and pg
 
@@ -75,11 +70,11 @@ The recommended workflow is
 
 * test within the virtual machine.
 
-Just clone your Rails fork into the rails-dev-box directory on the host computer:
+Just clone the Insight Rails application into the insight-vm/rails directory on the host computer:
 
     host $ ls
     README.md   Vagrantfile puppet
-    host $ git clone git@github.com:<your username>/rails.git
+    host $ git clone git@github.com:opencognition.com/insight.git
 
 Vagrant mounts that directory as _/vagrant_ within the virtual machine:
 

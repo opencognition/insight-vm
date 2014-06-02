@@ -1,9 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 Vagrant.configure('2') do |config|
-  config.vm.box      = 'precise32'
+  config.vm.box      = 'precise64'
   config.vm.box_url  = 'http://files.vagrantup.com/precise32.box'
-  config.vm.hostname = 'rails-dev-box'
+  config.vm.hostname = 'insight-vm'
 
   config.vm.provider "virtualbox" do |v|
     v.memory = 4096
@@ -23,9 +23,8 @@ Vagrant.configure('2') do |config|
     v.customize ['set', :id, '--on-window-close', 'keep-running']
   end
 
-  config.vm.network :forwarded_port, guest: 3000, host: 3000       # forwarding Rails
+  config.vm.network :forwarded_port, guest: 3000, host: 13000      # forwarding Rails
   config.vm.network :forwarded_port, guest: 5432, host: 15432      # forwarding PostgreSQL
-  config.vm.network :forwarded_port, guest: 3306, host: 13306      # forwarding MySQL
 
   config.vm.provision :puppet do |puppet|
     puppet.manifests_path = 'puppet/manifests'
