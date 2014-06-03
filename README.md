@@ -1,4 +1,4 @@
-# A Virtual Machine for Insight (Ruby 2.1.1, Ruby on Rails 4.1.1, PostgreSQL 9.3)
+# A virtual machine for Insight (Ruby 2.1.1, Ruby on Rails 4.1.1, PostgreSQL 9.3)
 
 ## Introduction
 
