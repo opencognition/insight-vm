@@ -2,9 +2,9 @@
 
 ## Introduction
 
-This project automates the setup of a development environment for working on Ruby on Rails itself. Use this virtual machine to work on a pull request with everything ready to hack and run the test suites.
+This project automates the setup of a development environment for working on the [Insight](https://github.com/opencognition/insight) Application.
 
-**Please note this virtual machine is not designed to be used for Rails application development.**
+**Please note this virtual machine is not designed to be used for production.**
 
 ## Requirements
 
@@ -17,7 +17,7 @@ This project automates the setup of a development environment for working on Rub
 Building the virtual machine is this easy:
 
     host $ git clone https://github.com/opencognition/insight-vm.git
-    host $ cd rails-dev-box
+    host $ cd insight-vm
     host $ vagrant up
 
 That's it.
@@ -31,7 +31,7 @@ If the base box is not present that command fetches it first. The setup itself t
     host $ vagrant ssh
     Welcome to Ubuntu 12.04 LTS (GNU/Linux 3.2.0-23-generic-pae i686)
     ...
-    vagrant@rails-dev-box:~$
+    vagrant@insight-vm:~$
 
 Port 3000 in the host computer is forwarded to port 3000 in the virtual machine. Thus, applications running in the virtual machine can be accessed via localhost:3000 in the host computer.
 
@@ -78,13 +78,13 @@ Just clone the Insight Rails application into the insight-vm/rails directory on 
 
 Vagrant mounts that directory as _/vagrant_ within the virtual machine:
 
-    vagrant@rails-dev-box:~$ ls /vagrant
+    vagrant@insight-vm:~$ ls /vagrant
     puppet  rails  README.md  Vagrantfile
 
 Install gem dependencies in there:
 
-    vagrant@rails-dev-box:~$ cd /vagrant/rails
-    vagrant@rails-dev-box:/vagrant/rails$ bundle
+    vagrant@insight-vm:~$ cd /vagrant/rails
+    vagrant@insight-vm:/vagrant/rails$ bundle
 
 We are ready to go to edit in the host, and test in the virtual machine.
 
@@ -161,4 +161,4 @@ Please check the Vagrant documentation on [NFS synced folders](http://docs.vagra
 
 ## License
 
-Released under the MIT License, Copyright (c) 2012–<i>ω</i> Xavier Noria.
+Released under the MIT License, Copyright (c) 2014–<i>ω</i> Open Cognition, Inc.
