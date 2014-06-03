@@ -50,17 +50,18 @@ class install_postgres {
     ip_mask_allow_all_users    => '0.0.0.0/0',
     listen_addresses           => '*',
     ipv4acls                   => ['host all all 10.0.2.2/32 trust'],
-    manage_firewall            => true,
+    manage_firewall            => false, #true,
     postgres_password          => 'postgres',
   }
 
   postgresql::server::role { 'insight':
-    password_hash => postgresql_password('insight_mgr', 'password'),
+    password_hash => postgresql_password('insight', 'password'),
+    superuser => true,
   }
 
   postgresql::server::db { 'insight_development':
-    user     => 'insight_mgr',
-    password => postgresql_password('insight_mgr', 'password'),
+    user     => 'insight',
+    password => postgresql_password('insight', 'password'),
   }
 
   package { 'libpq-dev':
@@ -71,8 +72,15 @@ class install_postgres {
     ensure  => installed,
     require => Class['postgresql::server'],
   }
+
 }
 class { 'install_postgres': }
+
+exec { "/usr/bin/psql -d template1 -c 'CREATE EXTENSION \"uuid-ossp\";'":
+  user   => "postgres",
+  unless => "/usr/bin/psql -d template1 -c '\\dx' | grep 'uuid-ossp'",
+  require => Class['install_postgres'],
+}
 
 # --- Memcached ----------------------------------------------------------------
 
