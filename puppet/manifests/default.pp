@@ -49,7 +49,7 @@ class install_postgres {
     ip_mask_deny_postgres_user => '0.0.0.0/32',
     ip_mask_allow_all_users    => '0.0.0.0/0',
     listen_addresses           => '*',
-    ipv4acls                   => ['host all all 10.0.2.2/32 trust'],
+#    ipv4acls                   => ['host all all 10.0.2.2/32 trust'],
     manage_firewall            => false, #true,
     postgres_password          => 'postgres',
   }
@@ -71,6 +71,15 @@ class install_postgres {
   package { 'postgresql-contrib':
     ensure  => installed,
     require => Class['postgresql::server'],
+  }
+
+  postgresql::server::pg_hba_rule { 'allow application network':
+    description => "Open up postgresql for access from 10.0.2.2/32",
+    type => 'host',
+    database => 'all',
+    user => 'all',
+    address => '10.0.2.2/32',
+    auth_method => 'trust',
   }
 
 }
