@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 Vagrant.configure('2') do |config|
   config.vm.box      = 'precise64'
-  config.vm.box_url  = 'http://files.vagrantup.com/precise32.box'
+  config.vm.box_url  = 'http://files.vagrantup.com/precise64.box'
   config.vm.hostname = 'insight-vm'
 
   config.vm.provider "virtualbox" do |v|
@@ -23,6 +23,7 @@ Vagrant.configure('2') do |config|
     v.customize ['set', :id, '--on-window-close', 'keep-running']
   end
 
+  config.vm.network :forwarded_port, guest: 8443, host: 18443      # forwarding CAS Server
   config.vm.network :forwarded_port, guest: 3000, host: 13000      # forwarding Rails
   config.vm.network :forwarded_port, guest: 5432, host: 15432      # forwarding PostgreSQL
 

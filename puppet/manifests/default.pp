@@ -54,15 +54,30 @@ class install_postgres {
     postgres_password          => 'postgres',
   }
 
-  postgresql::server::role { 'insight':
-    password_hash => postgresql_password('insight', 'password'),
+  postgresql::server::role { 'vagrant':
+    password_hash => postgresql_password('vagrant', nil),
+    superuser => true,
+  }
+
+  postgresql::server::role { 's_insight':
+    password_hash => postgresql_password('s_insight', 'password'),
     superuser => true,
   }
 
   postgresql::server::db { 'insight_development':
-    user     => 'insight',
-    password => postgresql_password('insight', 'password'),
+    user     => 's_insight',
+    password => postgresql_password('s_insight', 'password'),
   }
+
+  postgresql::server::role { 's_cas':
+    password_hash => postgresql_password('s_cas', 'password'),
+    superuser => true,
+  }
+
+#  postgresql::server::db { 'insight_development':
+#    user     => 's_cas',
+#    password => postgresql_password('s_cas', 'password'),
+#  }
 
   package { 'libpq-dev':
     ensure => installed,
@@ -85,11 +100,11 @@ class install_postgres {
 }
 class { 'install_postgres': }
 
-exec { "/usr/bin/psql -d template1 -c 'CREATE EXTENSION \"uuid-ossp\";'":
-  user   => "postgres",
-  unless => "/usr/bin/psql -d template1 -c '\\dx' | grep 'uuid-ossp'",
-  require => Class['install_postgres'],
-}
+#exec { "/usr/bin/psql -d template1 -c 'CREATE EXTENSION \"uuid-ossp\";'":
+#  user   => "postgres",
+#  unless => "/usr/bin/psql -d template1 -c '\\dx' | grep 'uuid-ossp'",
+#  require => Class['install_postgres'],
+#}
 
 # --- Memcached ----------------------------------------------------------------
 
